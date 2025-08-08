@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .routes import router as api_router
-from db import engine, Base
-from data_loader import load_csv_data
+from .db import engine, Base
+from .data_loader import load_csv_data
 import logging
 from .db import SessionLocal
 from .models import VendorApplication

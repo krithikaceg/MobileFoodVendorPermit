@@ -1,6 +1,6 @@
 import pandas as pd
 import os
-from db import SessionLocal
+from .db import SessionLocal
 from .models import VendorApplication
 import logging
 

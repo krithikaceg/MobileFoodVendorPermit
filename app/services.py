@@ -4,7 +4,7 @@ from .models import VendorApplication
 from sqlalchemy import select
 from sqlalchemy import func
 import logging
-from config import settings
+from .config import settings
 from .constants import APPROVED, FOOD_TRUCK
 
 logger = logging.getLogger('uvicorn.error')

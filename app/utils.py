@@ -1,5 +1,5 @@
 from math import radians, degrees, cos, sin, atan2, sqrt
-from config import settings
+from .config import settings
 
 def get_bounding_box(lat, lon):
     earth_radius = 6371  # km
