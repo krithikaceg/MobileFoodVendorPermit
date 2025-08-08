@@ -22,15 +22,15 @@ COPY main.py .
 COPY Mobile_Food_Facility_Permit_2.csv .
 COPY hungrydog_backup.sql .
 COPY init-db.sh .
+COPY start.sh .
 
 # Note: .env files are not needed in Cloud Run (using environment variables instead)
 
-# Make init script executable
-RUN chmod +x init-db.sh
+# Make scripts executable
+RUN chmod +x init-db.sh start.sh
 
 # Expose port
 EXPOSE 8000
 
 # Command to run the application
-# Use PORT environment variable for Cloud Run compatibility
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["./start.sh"]
