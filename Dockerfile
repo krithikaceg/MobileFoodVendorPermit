@@ -19,7 +19,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY app/ ./app/
 COPY tests/ ./tests/
 COPY main.py .
-COPY Mobile_Food_Facility_Permit_2.csv .
+COPY Mobile_Food_Facility_Permit.csv .
 COPY hungrydog_backup.sql .
 COPY init-db.sh .
 COPY start.sh .
