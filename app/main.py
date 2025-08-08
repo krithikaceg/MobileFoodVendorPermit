@@ -94,3 +94,16 @@ async def get_sample_data():
     except Exception as e:
         logger.error(f"Debug endpoint failed: {e}")
         return {"error": str(e)}
+
+@app.get("/debug/db-info")
+async def get_db_info():
+    """Get database connection info"""
+    import os
+    from app.db import DATABASE_URL
+    
+    return {
+        "database_url_env": os.getenv("DATABASE_URL"),
+        "database_url_used": DATABASE_URL,
+        "working_directory": os.getcwd(),
+        "files_in_dir": os.listdir(".")[:10]  # First 10 files
+    }

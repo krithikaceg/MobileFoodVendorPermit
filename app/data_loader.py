@@ -12,11 +12,18 @@ def load_csv_data():
     
     db = SessionLocal()
     try:
-        # Check if data already exists
+        # Check if data already exists and is valid
         count = db.query(VendorApplication).count()
         if count > 0:
-            logger.info(f"Database already has {count} records. Skipping data load.")
-            return
+            # Check if existing data is valid (has non-empty names)
+            valid_count = db.query(VendorApplication).filter(VendorApplication.applicant_name != '').count()
+            if valid_count > 0:
+                logger.info(f"Database already has {valid_count} valid records. Skipping data load.")
+                return
+            else:
+                logger.info(f"Found {count} empty records. Clearing and reloading data.")
+                db.query(VendorApplication).delete()
+                db.commit()
         
         logger.info("Loading data from CSV file...")
         
@@ -34,14 +41,14 @@ def load_csv_data():
         for _, row in df.iterrows():
             try:
                 vendor = VendorApplication(
-                    applicant_name=str(row.get('applicant_name', '')),
-                    facility_type=str(row.get('facility_type', '')),
-                    status=str(row.get('status', '')),
-                    address=str(row.get('address', '')),
-                    latitude=float(row.get('latitude', 0)) if pd.notna(row.get('latitude')) else None,
-                    longitude=float(row.get('longitude', 0)) if pd.notna(row.get('longitude')) else None,
-                    approved=pd.to_datetime(row.get('approved'), errors='coerce') if pd.notna(row.get('approved')) else None,
-                    expiration_date=pd.to_datetime(row.get('expiration_date'), errors='coerce') if pd.notna(row.get('expiration_date')) else None
+                    applicant_name=str(row.get('Name', '')),
+                    facility_type=str(row.get('FacilityType', '')),
+                    status=str(row.get('Status', '')),
+                    address=str(row.get('Address', '')),
+                    latitude=float(row.get('Latitude', 0)) if pd.notna(row.get('Latitude')) else None,
+                    longitude=float(row.get('Longitude', 0)) if pd.notna(row.get('Longitude')) else None,
+                    approved=pd.to_datetime(row.get('Approved'), errors='coerce') if pd.notna(row.get('Approved')) else None,
+                    expiration_date=pd.to_datetime(row.get('ExpirationDate'), errors='coerce') if pd.notna(row.get('ExpirationDate')) else None
                 )
                 db.add(vendor)
                 records_inserted += 1
