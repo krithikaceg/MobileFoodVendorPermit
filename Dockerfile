@@ -19,10 +19,15 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY app/ ./app/
 COPY tests/ ./tests/
 COPY main.py .
-COPY Mobile_Food_Facility_Permit_cleansed.csv .
+COPY Mobile_Food_Facility_Permit_2.csv .
+COPY hungrydog_backup.sql .
+COPY init-db.sh .
 
 # Copy .env file if it exists
 COPY .env* ./
+
+# Make init script executable
+RUN chmod +x init-db.sh
 
 # Expose port
 EXPOSE 8000

@@ -1,6 +1,25 @@
 version: '3.8'
 
 services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15
+    container_name: hungrydog-postgres
+    environment:
+      POSTGRES_DB: hungrydog
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d hungrydog"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
   # FastAPI Backend
   backend:
     build: .
@@ -8,10 +27,15 @@ services:
       - "8000:8000"
     environment:
       - PYTHONPATH=/app
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/hungrydog
+      - NEARBY_VENDORS_COUNT=5
     volumes:
       # Mount for development (optional - remove for production)
       - ./app:/app/app
       - ./tests:/app/tests
+    depends_on:
+      postgres:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
       interval: 30s
@@ -19,16 +43,10 @@ services:
       retries: 3
     restart: unless-stopped
 
-  # React Frontend
-  frontend:
-    build: ./frontend/vendor-search
-    ports:
-      - "3000:80"
-    environment:
-      - REACT_APP_API_URL=http://localhost:8000
-    depends_on:
-      - backend
-    restart: unless-stopped
+
+
+volumes:
+  postgres_data:
 
 networks:
   default:
