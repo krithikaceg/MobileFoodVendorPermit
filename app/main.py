@@ -62,3 +62,35 @@ async def health_check():
             "database": "error",
             "error": str(e)
         }
+
+@app.get("/debug/sample-data")
+async def get_sample_data():
+    """Get sample data to debug what's in the database"""
+    try:
+        from app.db import SessionLocal
+        from app.models import VendorApplication
+        
+        db = SessionLocal()
+        
+        # Get first 5 records
+        samples = db.query(VendorApplication).limit(5).all()
+        
+        # Get facility types
+        facility_types = db.query(VendorApplication.facility_type).distinct().all()
+        
+        db.close()
+        
+        return {
+            "sample_records": [
+                {
+                    "id": record.id,
+                    "applicant_name": record.applicant_name,
+                    "facility_type": record.facility_type,
+                    "address": record.address
+                } for record in samples
+            ],
+            "facility_types": [ft[0] for ft in facility_types if ft[0]]
+        }
+    except Exception as e:
+        logger.error(f"Debug endpoint failed: {e}")
+        return {"error": str(e)}
