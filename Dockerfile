@@ -23,8 +23,7 @@ COPY Mobile_Food_Facility_Permit_2.csv .
 COPY hungrydog_backup.sql .
 COPY init-db.sh .
 
-# Copy .env file if it exists
-COPY .env* ./
+# Note: .env files are not needed in Cloud Run (using environment variables instead)
 
 # Make init script executable
 RUN chmod +x init-db.sh
