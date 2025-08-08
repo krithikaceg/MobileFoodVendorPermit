@@ -35,7 +35,7 @@ def test_get_applicants_with_approved_status(db):
                           expiration_date=datetime.datetime(2025, 8, 1), applicant_name="A")
     ])
     db.commit()
-    result = get_applicants_within_radius(bounding_box, False, db)
+    result =  get_applicants_within_radius(bounding_box, db, False)
     assert len(result) == 2
     for applicant in result:
         assert applicant.status == "APPROVED"
@@ -54,7 +54,7 @@ def test_get_applicants_all_status_true(db):
                           expiration_date=datetime.datetime(2025, 8, 1), applicant_name="A")
     ])
     db.commit()
-    result = get_applicants_within_radius(bounding_box, True, db)
+    result =  get_applicants_within_radius(bounding_box, db, True)
     assert len(result) == 3
 
 def test_get_applicants_within_radius_all_status_true(db):
@@ -68,7 +68,7 @@ def test_get_applicants_within_radius_all_status_true(db):
     ])
     db.commit()
     bounding_box = (0, 45, -76, -74.5)
-    result = get_applicants_within_radius(bounding_box, True, db)
+    result =  get_applicants_within_radius(bounding_box, db, True)
 
     # returns vendors within boundary (max 15)
     assert len(result) == 2
@@ -91,7 +91,7 @@ def test_get_applicants_within_radius_result_greater_than_5(db):
     ])
     db.commit()
     bounding_box = (41.0001, 41.0007, -75.01, -75.0)
-    result = get_applicants_within_radius(bounding_box, True, db)
+    result =  get_applicants_within_radius(bounding_box, db, True)
 
     assert len(result) == 6
 
@@ -113,7 +113,7 @@ def test_get_applicants_within_radius(db):
     ])
     db.commit()
     bounding_box = (41.0001, 41.0003, -75.01, -75.0)
-    result = get_applicants_within_radius(bounding_box, True, db)
+    result =  get_applicants_within_radius(bounding_box, db, True)
 
     assert len(result) == 3
 
@@ -135,7 +135,7 @@ def test_get_vendors_nearby_return_top_5(db):
     ])
     db.commit()
     
-    result = get_vendors_nearby(41.0, -75.0, False, db)
+    result =  get_vendors_nearby(41.0, -75.0, db, False)
 
     assert len(result) == 5
     for r in result:
@@ -159,7 +159,7 @@ def test_get_vendors_nearby_all_status_true_max_5(db):
     ])
     db.commit()
     
-    result = get_vendors_nearby(41.003, -75.0, True, db)
+    result =  get_vendors_nearby(41.003, -75.0, db, True)
 
     assert len(result) == 5 
 
@@ -173,7 +173,7 @@ def test_get_vendors_nearby_same_address_same_vendor_name(db):
     ])
     db.commit()
     
-    result = get_vendors_nearby(41.001, -75.0, True, db)
+    result =  get_vendors_nearby(41.001, -75.0, db, True)
 
     assert len(result) == 1 
 
@@ -187,7 +187,7 @@ def test_get_vendors_nearby_same_address_different_vendor_name(db):
     ])
     db.commit()
     
-    result = get_vendors_nearby(41.001, -75.0, True, db)
+    result =  get_vendors_nearby(41.001, -75.0, db, True)
 
     assert len(result) == 2
 
@@ -201,7 +201,7 @@ def test_get_vendors_nearby_same_address_same_vendor_name_only_approved(db):
     ])
     db.commit()
     
-    result = get_vendors_nearby(41.001, -75.0, False, db)
+    result =  get_vendors_nearby(41.001, -75.0, db, False)
 
     assert len(result) == 1 
     assert result[0].id == 1
@@ -216,7 +216,7 @@ def test_get_vendors_nearby_same_address_different_vendor_name_only_approved(db)
     ])
     db.commit()
     
-    result = get_vendors_nearby(41.001, -75.0, True, db)
+    result =  get_vendors_nearby(41.001, -75.0, db, True)
 
     assert len(result) == 2
     assert result[0].id == 1

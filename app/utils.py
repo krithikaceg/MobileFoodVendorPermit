@@ -1,16 +1,15 @@
 from math import radians, degrees, cos, sin, atan2, sqrt
-import os
+from app.settings import settings
 
-SEARCH_RADIUS_MILES = os.getenv("SEARCH_RADIUS_MILES")
-
-def get_bounding_box(lat, lon, radius_miles = SEARCH_RADIUS_MILES):
+def get_bounding_box(lat, lon):
     earth_radius = 6371  # km
+    radius_miles = settings.search_radius_miles
 
     lat = float(lat)
     lon = float(lon)
 
-    delta_lat = degrees((float(radius_miles) / 1.6) / earth_radius)
-    delta_lon = degrees((float(radius_miles) / 1.6) / (earth_radius * cos(radians(lat))))
+    delta_lat = degrees((radius_miles / 1.6) / earth_radius)
+    delta_lon = degrees((radius_miles / 1.6) / (earth_radius * cos(radians(lat))))
 
     min_lat = lat - delta_lat
     max_lat = lat + delta_lat

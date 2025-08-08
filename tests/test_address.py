@@ -22,6 +22,19 @@ def db():
         db.close()
         Base.metadata.drop_all(bind=engine)
 
+def test_get_applicants_by_address_non_existent(db):
+    # Arrange
+    db.add_all([
+        VendorApplication(applicant_name = 'A1', address = '123 Sansome st', facility_type="Truck", status="APPROVED"),
+        VendorApplication(applicant_name = 'A1', address = '123 Sansome st', facility_type="Truck", status="PENDING"),
+        VendorApplication(applicant_name = 'A2', address = '4 Market st', facility_type="Cart", status="APPROVED"),
+        VendorApplication(applicant_name = 'A3', address = '4 Main st', facility_type="Truck", status="APPROVED"),
+    ])
+    db.commit()
+    
+    result = get_vendors_by_address('california',  db)
+    assert len(result) == 0
+
 def test_get_applicants_by_address(db):
     # Arrange
     db.add_all([
@@ -31,11 +44,46 @@ def test_get_applicants_by_address(db):
         VendorApplication(applicant_name = 'A3', address = '4 Main st', facility_type="Truck", status="APPROVED"),
     ])
     db.commit()
-    # Assert
-    assert len(get_vendors_by_address('california',  db)) == 0
-    assert len(get_vendors_by_address('San',  db)) == 2
-    assert len(get_vendors_by_address('Mai',  db)) == 1
-    assert len(get_vendors_by_address(' Mai ',  db)) == 1
-    assert len(get_vendors_by_address('market',  db)) == 0
     
+    result = get_vendors_by_address('San',  db)
+    assert len(result) == 2
+
+def test_get_applicants_by_address_matching_more_than_one(db):
+    # Arrange
+    db.add_all([
+        VendorApplication(applicant_name = 'A1', address = '123 Sansome st', facility_type="Truck", status="APPROVED"),
+        VendorApplication(applicant_name = 'A1', address = '123 Sansome st', facility_type="Truck", status="PENDING"),
+        VendorApplication(applicant_name = 'A2', address = '4 Market st', facility_type="Truck", status="APPROVED"),
+        VendorApplication(applicant_name = 'A3', address = '4 Main st', facility_type="Truck", status="APPROVED"),
+    ])
+    db.commit()
+    
+    result = get_vendors_by_address('Ma',  db)
+    assert len(result) == 2
+
+def test_get_applicants_by_address_trimming(db):
+    # Arrange
+    db.add_all([
+        VendorApplication(applicant_name = 'A1', address = '123 Sansome st', facility_type="Truck", status="APPROVED"),
+        VendorApplication(applicant_name = 'A1', address = '123 Sansome st', facility_type="Truck", status="PENDING"),
+        VendorApplication(applicant_name = 'A2', address = '4 Market st', facility_type="Cart", status="APPROVED"),
+        VendorApplication(applicant_name = 'A3', address = '4 Main st', facility_type="Truck", status="APPROVED"),
+    ])
+    db.commit()
+    
+    result = get_vendors_by_address(' Mai ',  db)
+    assert len(result) == 1
+
+def test_get_applicants_by_address_only_truck(db):
+    # Arrange
+    db.add_all([
+        VendorApplication(applicant_name = 'A1', address = '123 Sansome st', facility_type="Truck", status="APPROVED"),
+        VendorApplication(applicant_name = 'A1', address = '123 Sansome st', facility_type="Truck", status="PENDING"),
+        VendorApplication(applicant_name = 'A2', address = '4 Market st', facility_type="Cart", status="APPROVED"),
+        VendorApplication(applicant_name = 'A3', address = '4 Main st', facility_type="Truck", status="APPROVED"),
+    ])
+    db.commit()
+    
+    result = get_vendors_by_address('market',  db)
+    assert len(result) == 0
 

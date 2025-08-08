@@ -22,7 +22,7 @@ def db():
         db.close()
         Base.metadata.drop_all(bind=engine)
 
-def test_get_vendors_by_name(db):
+def test_get_vendors_by_name_non_existent(db):
     # Arrange
     db.add_all([
         VendorApplication(applicant_name = "Authentic India", status="APPROVED"),
@@ -32,13 +32,102 @@ def test_get_vendors_by_name(db):
     ])
     db.commit()
 
-    # Assert
-    assert len(get_vendors_by_name('ANBC', False, db)) == 0
-    assert len(get_vendors_by_name('Authentic India', False, db)) == 1
-    assert len(get_vendors_by_name('Authentic India', True, db)) == 1
-    assert len(get_vendors_by_name('authentic INDIA', True, db)) == 1
-    assert len(get_vendors_by_name('El Tonayense #60', False, db)) == 1
-    assert len(get_vendors_by_name('El Tonayense #60', True, db)) == 2
-    assert len(get_vendors_by_name('Truly Food & More', True, db)) == 1
-    assert len(get_vendors_by_name('Truly Food & More', False, db)) == 0
-    assert len(get_vendors_by_name('delete from vendor_application', True, db)) == 0
+    result =  get_vendors_by_name('ANBC', db, False)
+    assert len(result) == 0
+    
+
+def test_get_vendors_by_name_approved(db):
+    # Arrange
+    db.add_all([
+        VendorApplication(applicant_name = "Authentic India", status="APPROVED"),
+        VendorApplication(applicant_name = "El Tonayense #60", status="PENDING"),
+        VendorApplication(applicant_name = "El Tonayense #60", status="APPROVED"),
+        VendorApplication(applicant_name = "Truly Food & More", status="EXPIRED")
+    ])
+    db.commit()
+    result =  get_vendors_by_name('Authentic India', db, False)
+    assert len(result) == 1
+
+def test_get_vendors_by_name_all_status(db):
+    # Arrange
+    db.add_all([
+        VendorApplication(applicant_name = "Authentic India", status="APPROVED"),
+        VendorApplication(applicant_name = "El Tonayense #60", status="PENDING"),
+        VendorApplication(applicant_name = "El Tonayense #60", status="APPROVED"),
+        VendorApplication(applicant_name = "Truly Food & More", status="EXPIRED")
+    ])
+    db.commit()
+    result =  get_vendors_by_name('Authentic India', db, True)
+    assert len(result) == 1
+
+def test_get_vendors_by_name_approved_case_insentive(db):
+    # Arrange
+    db.add_all([
+        VendorApplication(applicant_name = "Authentic India", status="APPROVED"),
+        VendorApplication(applicant_name = "El Tonayense #60", status="PENDING"),
+        VendorApplication(applicant_name = "El Tonayense #60", status="APPROVED"),
+        VendorApplication(applicant_name = "Truly Food & More", status="EXPIRED")
+    ])
+    db.commit()
+    result =  get_vendors_by_name('authentic INDIA', db, True)
+    assert len(result) == 1
+
+def test_get_vendors_by_name_only_approved(db):
+    # Arrange
+    db.add_all([
+        VendorApplication(applicant_name = "Authentic India", status="APPROVED"),
+        VendorApplication(applicant_name = "El Tonayense #60", status="PENDING"),
+        VendorApplication(applicant_name = "El Tonayense #60", status="APPROVED"),
+        VendorApplication(applicant_name = "Truly Food & More", status="EXPIRED")
+    ])
+    db.commit()
+    result =  get_vendors_by_name('El Tonayense #60', db, False)
+    assert len(result) == 1
+
+def test_get_vendors_by_name_all_status(db):
+    # Arrange
+    db.add_all([
+        VendorApplication(applicant_name = "Authentic India", status="APPROVED"),
+        VendorApplication(applicant_name = "El Tonayense #60", status="PENDING"),
+        VendorApplication(applicant_name = "El Tonayense #60", status="APPROVED"),
+        VendorApplication(applicant_name = "Truly Food & More", status="EXPIRED")
+    ])
+    db.commit()
+    result =  get_vendors_by_name('El Tonayense #60', db, True)
+    assert len(result) == 2
+
+def test_get_vendors_by_name_status_expired_all_status(db):
+    # Arrange
+    db.add_all([
+        VendorApplication(applicant_name = "Authentic India", status="APPROVED"),
+        VendorApplication(applicant_name = "El Tonayense #60", status="PENDING"),
+        VendorApplication(applicant_name = "El Tonayense #60", status="APPROVED"),
+        VendorApplication(applicant_name = "Truly Food & More", status="EXPIRED")
+    ])
+    db.commit()
+    result =  get_vendors_by_name('Truly Food & More', db, True)
+    assert len(result) == 1
+
+def test_get_vendors_by_name_status_expired_approved_only(db):
+    # Arrange
+    db.add_all([
+        VendorApplication(applicant_name = "Authentic India", status="APPROVED"),
+        VendorApplication(applicant_name = "El Tonayense #60", status="PENDING"),
+        VendorApplication(applicant_name = "El Tonayense #60", status="APPROVED"),
+        VendorApplication(applicant_name = "Truly Food & More", status="EXPIRED")
+    ])
+    db.commit()
+    result =  get_vendors_by_name('Truly Food & More', db, False)
+    assert len(result) == 0
+
+def test_get_vendors_by_name_sql_injection(db):
+    # Arrange
+    db.add_all([
+        VendorApplication(applicant_name = "Authentic India", status="APPROVED"),
+        VendorApplication(applicant_name = "El Tonayense #60", status="PENDING"),
+        VendorApplication(applicant_name = "El Tonayense #60", status="APPROVED"),
+        VendorApplication(applicant_name = "Truly Food & More", status="EXPIRED")
+    ])
+    db.commit()
+    result =  get_vendors_by_name('delete from food_vendor_application;', db, True)
+    assert len(result) == 0
