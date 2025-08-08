@@ -1,4 +1,4 @@
-from app.db import SessionLocal
+from db import SessionLocal
 from sqlalchemy.orm import Session
 from fastapi import Depends
 

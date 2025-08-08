@@ -1,0 +1,2 @@
+APPROVED = "APPROVED"
+FOOD_TRUCK = "Truck"

@@ -1,10 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import router as api_router
-from app.db import engine, Base
-from app.models import VendorApplication
-from app.data_loader import load_csv_data
+from .routes import router as api_router
+from db import engine, Base
+from data_loader import load_csv_data
 import logging
+from .db import SessionLocal
+from .models import VendorApplication
+import os
+from .config import settings
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -43,9 +46,6 @@ app.include_router(api_router)
 async def health_check():
     """Simple health check"""
     try:
-        from app.db import SessionLocal
-        from app.models import VendorApplication
-        
         db = SessionLocal()
         count = db.query(VendorApplication).count()
         db.close()
@@ -67,9 +67,6 @@ async def health_check():
 async def get_sample_data():
     """Get sample data to debug what's in the database"""
     try:
-        from app.db import SessionLocal
-        from app.models import VendorApplication
-        
         db = SessionLocal()
         
         # Get first 5 records
@@ -98,12 +95,10 @@ async def get_sample_data():
 @app.get("/debug/db-info")
 async def get_db_info():
     """Get database connection info"""
-    import os
-    from app.db import DATABASE_URL
     
     return {
         "database_url_env": os.getenv("DATABASE_URL"),
-        "database_url_used": DATABASE_URL,
+        "database_url_used": settings.database_url,
         "working_directory": os.getcwd(),
         "files_in_dir": os.listdir(".")[:10]  # First 10 files
     }

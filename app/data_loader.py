@@ -1,8 +1,7 @@
 import pandas as pd
 import os
-from sqlalchemy.orm import Session
-from app.db import SessionLocal, engine
-from app.models import VendorApplication
+from db import SessionLocal
+from .models import VendorApplication
 import logging
 
 logger = logging.getLogger(__name__)
