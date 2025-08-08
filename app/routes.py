@@ -14,24 +14,7 @@ logger.setLevel(logging.DEBUG)
 
 router = APIRouter()
 
-@router.get("/health")
-async def health_check(db: Session = Depends(get_db)):
-    """Health check endpoint that also verifies database connectivity"""
-    try:
-        # Try to count records in the table
-        count = db.query(VendorApplication).count()
-        return {
-            "status": "healthy", 
-            "database": "connected",
-            "vendor_count": count
-        }
-    except Exception as e:
-        logger.error(f"Health check failed: {e}")
-        return {
-            "status": "unhealthy",
-            "database": "error",
-            "error": str(e)
-        }
+
 
 @router.get("/applicants")
 async def read_vendors(name: str, all_status: bool = False, db: Session = Depends(get_db)):

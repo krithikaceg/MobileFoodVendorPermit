@@ -37,3 +37,28 @@ app.add_middleware(
 )
 
 app.include_router(api_router)
+
+# Add a simple health check directly to the app
+@app.get("/health")
+async def health_check():
+    """Simple health check"""
+    try:
+        from app.db import SessionLocal
+        from app.models import VendorApplication
+        
+        db = SessionLocal()
+        count = db.query(VendorApplication).count()
+        db.close()
+        
+        return {
+            "status": "healthy", 
+            "database": "connected",
+            "vendor_count": count
+        }
+    except Exception as e:
+        logger.error(f"Health check failed: {e}")
+        return {
+            "status": "unhealthy",
+            "database": "error",
+            "error": str(e)
+        }
